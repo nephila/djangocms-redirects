@@ -6,7 +6,7 @@ from django.core.cache import cache
 from django.db import models
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
-from django.utils.encoding import python_2_unicode_compatible
+from django.utils.six import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 RESPONSE_CODES = (
