@@ -6,7 +6,6 @@ from django.core.cache import cache
 from django.db import models
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
-from django.utils.six import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 RESPONSE_CODES = (
@@ -16,7 +15,6 @@ RESPONSE_CODES = (
 )
 
 
-@python_2_unicode_compatible
 class Redirect(models.Model):
     site = models.ForeignKey(Site, verbose_name=_('site'), on_delete=models.CASCADE)
     old_path = models.CharField(
