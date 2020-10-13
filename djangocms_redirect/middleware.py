@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
-from operator import itemgetter
-
 from django import http
 from django.apps import apps
 from django.conf import settings
@@ -11,11 +9,13 @@ from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
 from django.utils.deprecation import MiddlewareMixin
-from django.utils.http import urlunquote_plus
+
+from operator import itemgetter
+
+from urllib.parse import unquote_plus
 
 from .models import Redirect
 from .utils import get_key_from_path_and_site
-
 
 class RedirectMiddleware(MiddlewareMixin):
 
@@ -38,23 +38,28 @@ class RedirectMiddleware(MiddlewareMixin):
         ):
             return response
 
-        full_path_quoted, part, querystring = request.get_full_path().partition('?')
-        possible_paths = [full_path_quoted]
-        full_path_unquoted = urlunquote_plus(full_path_quoted)
-        if full_path_unquoted != full_path_quoted:
-            possible_paths.append(urlunquote_plus(full_path_unquoted))
-        if not settings.APPEND_SLASH and not request.path.endswith('/'):
-            full_path_slash, __, __ = request.get_full_path(
-                force_append_slash=True
-            ).partition('?')
-            possible_paths.append(full_path_slash)
-            full_path_slash_unquoted = urlunquote_plus(full_path_slash)
-            if full_path_slash_unquoted != full_path_slash:
-                possible_paths.append(full_path_slash_unquoted)
-        querystring = '%s%s' % (part, querystring)
+        req_path = request.path
+        # get the query string
+        querystring = request.META.get('QUERY_STRING', '')
+        if querystring:
+            querystring = '?%s' % querystring
+        # start with the path as is
+        possible_paths = [req_path]
+        # add the unquoted path if it differs
+        req_path_unquoted = unquote_plus(req_path)
+        if req_path_unquoted != req_path:
+            possible_paths.append(req_path_unquoted)
+        # if a slash is missing, try to append it
+        if not req_path.endswith('/'):
+            req_path_slash = req_path + '/'
+            possible_paths.append(req_path_slash)
+            req_path_slash_unquoted = unquote_plus(req_path_slash)
+            if req_path_slash_unquoted != req_path_slash:
+                possible_paths.append(req_path_slash_unquoted)
+
         current_site = get_current_site(request)
         r = None
-        key = get_key_from_path_and_site(full_path_quoted, settings.SITE_ID)
+        key = get_key_from_path_and_site(req_path, settings.SITE_ID)
         cached_redirect = cache.get(key)
         if not cached_redirect:
             for path in possible_paths:

@@ -2,6 +2,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 from django.contrib.sites.models import Site
+from django.conf import settings
 from django.core.cache import cache
 from django.db import models
 from django.db.models.signals import post_delete, post_save
@@ -61,6 +62,13 @@ class Redirect(models.Model):
         db_table = 'django_redirect'
         unique_together = (('site', 'old_path'),)
         ordering = ('old_path',)
+
+    def clean(self):
+        if settings.APPEND_SLASH and not self.old_path.endswith('/'):
+            self.old_path = '%s/' % self.old_path
+        if not self.old_path.startswith('/'):
+            self.old_path = '/%s' % self.old_path
+        super(Redirect, self).clean()
 
     def __str__(self):
         return '{0} ---> {1}'.format(self.old_path, self.new_path)
