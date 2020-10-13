@@ -113,7 +113,7 @@ class TestRedirect(BaseRedirectTest):
         response = self.client.get(escaped_path)
         self.assertEqual(response.status_code, 404)
 
-        redirect.old_path = '/path (escaped)/'
+        redirect.old_path = '/path%20(escaped)/'
         redirect.save()
         response = self.client.get(escaped_path)
         self.assertEqual(response.status_code, 302)

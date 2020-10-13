@@ -10,6 +10,8 @@ from django.dispatch import receiver
 from six import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
+from urllib.parse import unquote_plus
+
 RESPONSE_CODES = (
     ('301', _('301 - Permanent redirection')),
     ('302', _('302- Temporary redirection'),),
@@ -78,5 +80,6 @@ class Redirect(models.Model):
 @receiver(post_delete, sender=Redirect)
 def clear_redirect_cache(**kwargs):
     from .utils import get_key_from_path_and_site
-    key = get_key_from_path_and_site(kwargs['instance'].old_path, kwargs['instance'].site_id)
+    path = unquote_plus(kwargs['instance'].old_path)
+    key = get_key_from_path_and_site(path, kwargs['instance'].site_id)
     cache.delete(key)
