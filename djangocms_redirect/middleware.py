@@ -9,13 +9,13 @@ from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
 from django.utils.deprecation import MiddlewareMixin
+from django.utils.encoding import iri_to_uri, escape_uri_path
 
 from operator import itemgetter
 
-from urllib.parse import unquote_plus
-
 from .models import Redirect
 from .utils import get_key_from_path_and_site
+
 
 class RedirectMiddleware(MiddlewareMixin):
 
@@ -42,20 +42,20 @@ class RedirectMiddleware(MiddlewareMixin):
         # get the query string
         querystring = request.META.get('QUERY_STRING', '')
         if querystring:
-            querystring = '?%s' % querystring
+            querystring = '?%s' % iri_to_uri(querystring)
         # start with the path as is
         possible_paths = [req_path]
         # add the unquoted path if it differs
-        req_path_unquoted = unquote_plus(req_path)
-        if req_path_unquoted != req_path:
-            possible_paths.append(req_path_unquoted)
+        req_path_quoted = escape_uri_path(req_path)
+        if req_path_quoted != req_path:
+            possible_paths.append(req_path_quoted)
         # if a slash is missing, try to append it
         if not req_path.endswith('/'):
             req_path_slash = req_path + '/'
             possible_paths.append(req_path_slash)
-            req_path_slash_unquoted = unquote_plus(req_path_slash)
-            if req_path_slash_unquoted != req_path_slash:
-                possible_paths.append(req_path_slash_unquoted)
+            req_path_slash_quoted = escape_uri_path(req_path_slash)
+            if req_path_slash_quoted != req_path_slash:
+                possible_paths.append(req_path_slash_quoted)
 
         current_site = get_current_site(request)
         r = None
