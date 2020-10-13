@@ -61,6 +61,8 @@ class RedirectMiddleware(MiddlewareMixin):
         r = None
         key = get_key_from_path_and_site(req_path, settings.SITE_ID)
         cached_redirect = cache.get(key)
+        if req_path == '/path (escaped)/' and cached_redirect:
+            raise Exception(cached_redirect)
         if not cached_redirect:
             for path in possible_paths:
                 filters = dict(site=current_site, old_path=path)
@@ -71,6 +73,7 @@ class RedirectMiddleware(MiddlewareMixin):
                     r = self._match_substring(path)
                     if r:
                         break
+
             cached_redirect = {
                 'site': settings.SITE_ID,
                 'redirect': r.new_path if r else None,

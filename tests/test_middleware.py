@@ -113,7 +113,7 @@ class TestRedirect(BaseRedirectTest):
         response = self.client.get(escaped_path)
         self.assertEqual(response.status_code, 404)
 
-        redirect.old_path = '/path%20(escaped)/'
+        redirect.old_path = '/path (escaped)/'
         redirect.save()
         response = self.client.get(escaped_path)
         self.assertEqual(response.status_code, 302)
@@ -219,7 +219,7 @@ class TestRedirect(BaseRedirectTest):
     def test_redirect_no_append_slash_quoted(self):
         pages = self.get_pages()
 
-        original_path = '/path%20(escaped)/'
+        original_path = '/path (escaped)/'
         with override_settings(APPEND_SLASH=False):
             redirect = Redirect.objects.create(
                 site=self.site_1,
