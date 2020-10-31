@@ -3,8 +3,11 @@
 History
 -------
 
-Unreleased
+0.6.0 (unreleased)
 ++++++++++++++++++
+
+* Drop Python 2.7 support
+
 
 * Nothing yet
 

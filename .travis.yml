@@ -5,7 +5,6 @@ python:
   - 3.7
   - 3.6
   - 3.5
-  - 2.7
 
 env:
   matrix:
@@ -21,7 +20,6 @@ env:
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
   - pip install -U tox>=1.8 coveralls
-  - "if [[ $TRAVIS_PYTHON_VERSION == '2.7' ]]; then export PYVER=py27; fi"
   - "if [[ $TRAVIS_PYTHON_VERSION == '3.5' ]]; then export PYVER=py35; fi"
   - "if [[ $TRAVIS_PYTHON_VERSION == '3.6' ]]; then export PYVER=py36; fi"
   - "if [[ $TRAVIS_PYTHON_VERSION == '3.7' ]]; then export PYVER=py37; fi"
@@ -38,12 +36,6 @@ after_success:
 
 matrix:
   exclude:
-  - python: 2.7
-    env: TOXENV='pep8'
-  - python: 2.7
-    env: TOXENV='isort'
-  - python: 2.7
-    env: TOXENV='docs'
   - python: 3.5
     env: TOXENV='pep8'
   - python: 3.5
