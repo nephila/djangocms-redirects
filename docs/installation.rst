@@ -50,4 +50,3 @@ Settings
 * ``DJANGOCMS_REDIRECT_404_ONLY``: If ``True`` (the default) and ``DJANGOCMS_REDIRECT_USE_REQUEST=False``
   the redirect will be checked only for responses that return 404 (the default ``django.contrib.redirect``
   behavior). This is the lowest impact option in terms of performance and the advised configuration.
-

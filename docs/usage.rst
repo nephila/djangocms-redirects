@@ -48,6 +48,3 @@ The request will be then redirected to the **Redirect to** without further chang
 * Redirect from: ``/en/some``
 * Redirect to: ``/en/other``
 * Resulting redirect: ``/en/other``
-
-
-
