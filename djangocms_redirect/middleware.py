@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
-
 from operator import itemgetter
 
 from django import http
@@ -24,34 +21,29 @@ class RedirectMiddleware(MiddlewareMixin):
     response_redirect_class = http.HttpResponseRedirect
     response_permanent_redirect_class = http.HttpResponsePermanentRedirect
 
-    no_site_message = 'RedirectFallbackMiddleware requires django.contrib.sites to work.'
+    no_site_message = "RedirectFallbackMiddleware requires django.contrib.sites to work."
 
     def __init__(self, *args, **kwargs):
-        if not apps.is_installed('django.contrib.sites'):
+        if not apps.is_installed("django.contrib.sites"):
             raise ImproperlyConfigured(self.no_site_message)
-        super(RedirectMiddleware, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def do_redirect(self, request, response=None):
-        if (
-            getattr(settings, 'DJANGOCMS_REDIRECT_404_ONLY', True) and
-            response and response.status_code != 404
-        ):
+        if getattr(settings, "DJANGOCMS_REDIRECT_404_ONLY", True) and response and response.status_code != 404:
             return response
 
-        full_path_quoted, part, querystring = request.get_full_path().partition('?')
+        full_path_quoted, part, querystring = request.get_full_path().partition("?")
         possible_paths = [full_path_quoted]
         full_path_unquoted = urlunquote_plus(full_path_quoted)
         if full_path_unquoted != full_path_quoted:
             possible_paths.append(urlunquote_plus(full_path_unquoted))
-        if not settings.APPEND_SLASH and not request.path.endswith('/'):
-            full_path_slash, __, __ = request.get_full_path(
-                force_append_slash=True
-            ).partition('?')
+        if not settings.APPEND_SLASH and not request.path.endswith("/"):
+            full_path_slash, __, __ = request.get_full_path(force_append_slash=True).partition("?")
             possible_paths.append(full_path_slash)
             full_path_slash_unquoted = urlunquote_plus(full_path_slash)
             if full_path_slash_unquoted != full_path_slash:
                 possible_paths.append(full_path_slash_unquoted)
-        querystring = '%s%s' % (part, querystring)
+        querystring = "{}{}".format(part, querystring)
         current_site = get_current_site(request)
         r = None
         key = get_key_from_path_and_site(full_path_quoted, settings.SITE_ID)
@@ -67,34 +59,27 @@ class RedirectMiddleware(MiddlewareMixin):
                     if r:
                         break
             cached_redirect = {
-                'site': settings.SITE_ID,
-                'redirect': r.new_path if r else None,
-                'status_code': r.response_code if r else None,
+                "site": settings.SITE_ID,
+                "redirect": r.new_path if r else None,
+                "status_code": r.response_code if r else None,
             }
-            cache.set(
-                key, cached_redirect,
-                timeout=getattr(settings, 'DJANGOCMS_REDIRECT_CACHE_TIMEOUT', 3600)
-            )
-        if cached_redirect['redirect'] == '':
+            cache.set(key, cached_redirect, timeout=getattr(settings, "DJANGOCMS_REDIRECT_CACHE_TIMEOUT", 3600))
+        if cached_redirect["redirect"] == "":
             return self.response_gone_class()
-        if cached_redirect['status_code'] == '302':
-            return self.response_redirect_class(
-                '%s%s' % (cached_redirect['redirect'], querystring)
-            )
-        elif cached_redirect['status_code'] == '301':
-            return self.response_permanent_redirect_class(
-                '%s%s' % (cached_redirect['redirect'], querystring)
-            )
-        elif cached_redirect['status_code'] == '410':
+        if cached_redirect["status_code"] == "302":
+            return self.response_redirect_class("{}{}".format(cached_redirect["redirect"], querystring))
+        elif cached_redirect["status_code"] == "301":
+            return self.response_permanent_redirect_class("{}{}".format(cached_redirect["redirect"], querystring))
+        elif cached_redirect["status_code"] == "410":
             return self.response_gone_class()
 
     def process_request(self, request):
-        if getattr(settings, 'DJANGOCMS_REDIRECT_USE_REQUEST', True):
+        if getattr(settings, "DJANGOCMS_REDIRECT_USE_REQUEST", True):
             return self.do_redirect(request)
 
     def process_response(self, request, response):
         redirect = None
-        if not getattr(settings, 'DJANGOCMS_REDIRECT_USE_REQUEST', True):
+        if not getattr(settings, "DJANGOCMS_REDIRECT_USE_REQUEST", True):
             redirect = self.do_redirect(request, response)
         if redirect:
             return redirect
@@ -102,9 +87,7 @@ class RedirectMiddleware(MiddlewareMixin):
 
     def _match_substring(self, original_path):
         redirects = [
-            (r.old_path, r) for r in Redirect.objects.filter(
-                Q(subpath_match=True) | Q(catchall_redirect=True)
-            )
+            (r.old_path, r) for r in Redirect.objects.filter(Q(subpath_match=True) | Q(catchall_redirect=True))
         ]
         redirects = sorted(redirects, key=itemgetter(0), reverse=True)
         for url in redirects:

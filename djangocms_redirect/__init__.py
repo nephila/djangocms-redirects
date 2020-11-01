@@ -1,4 +1,1 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
-
-__version__ = '0.5.1.dev1'
+__version__ = "0.5.1.dev1"

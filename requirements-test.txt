@@ -1,6 +1,7 @@
 -r requirements.txt
-coverage<5.0
-flake8>=2.1.0
+coverage
+coveralls
+mock>=1.0.1
 tox>=1.7.0
 python-memcached
 django-app-helper

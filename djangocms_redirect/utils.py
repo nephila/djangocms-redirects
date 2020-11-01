@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import hashlib
 
 
@@ -10,6 +9,6 @@ def get_key_from_path_and_site(path, site_id):
 
     total key length: Prefix (11) + HASH (224) + ID (max 3) + 2 separators (2) = 240
     """
-    hashed_path = hashlib.sha224(path.encode('utf-8')).hexdigest()
-    key = 'CMSREDIRECT:{}:{}'.format(hashed_path, site_id)
+    hashed_path = hashlib.sha224(path.encode("utf-8")).hexdigest()
+    key = "CMSREDIRECT:{}:{}".format(hashed_path, site_id)
     return key
