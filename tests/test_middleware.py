@@ -216,7 +216,7 @@ class TestRedirect(BaseRedirectTest):
                 response = self.client.get(pages[1].get_absolute_url().rstrip('/'))
             self.assertRedirects(response, redirect.new_path, status_code=301)
 
-    def test_redirect_no_append_slash_quoted(self):
+    def test_redirect_no_append_slash_unquoted(self):
         pages = self.get_pages()
 
         original_path = '/path (escaped)/'
@@ -229,6 +229,22 @@ class TestRedirect(BaseRedirectTest):
             )
 
             with self.assertNumQueries(5):
+                response = self.client.get(original_path.rstrip('/'))
+            self.assertRedirects(response, redirect.new_path, status_code=301)
+
+    def test_redirect_no_append_slash_quoted(self):
+        pages = self.get_pages()
+
+        original_path = '/path%20(escaped)/'
+        with override_settings(APPEND_SLASH=False):
+            redirect = Redirect.objects.create(
+                site=self.site_1,
+                old_path=original_path,
+                new_path=pages[0].get_absolute_url(),
+                response_code='301',
+            )
+
+            with self.assertNumQueries(7):
                 response = self.client.get(original_path.rstrip('/'))
             self.assertRedirects(response, redirect.new_path, status_code=301)
 
