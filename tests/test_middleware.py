@@ -7,7 +7,7 @@ from django.utils.http import urlunquote_plus
 from djangocms_redirect.middleware import RedirectMiddleware
 from djangocms_redirect.models import Redirect
 
-from .base import BaseRedirectTest
+from . import BaseRedirectTest
 
 
 class TestRedirect(BaseRedirectTest):
