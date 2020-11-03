@@ -4,6 +4,7 @@ from django.forms import ModelForm
 from django.utils.translation import get_language
 
 from .models import Redirect
+from .utils import normalize_url
 
 
 class RedirectForm(ModelForm):
@@ -17,6 +18,9 @@ class RedirectForm(ModelForm):
         widget.language = get_language()
         self.fields["old_path"].widget = widget
         self.fields["new_path"].widget = widget
+
+    def clean_old_path(self):
+        return normalize_url(self.cleaned_data.get("old_path"))
 
 
 @admin.register(Redirect)

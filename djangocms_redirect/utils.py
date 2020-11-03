@@ -1,5 +1,7 @@
 import hashlib
 
+from django.conf import settings
+
 
 def get_key_from_path_and_site(path, site_id):
     """
@@ -12,3 +14,11 @@ def get_key_from_path_and_site(path, site_id):
     hashed_path = hashlib.sha224(path.encode("utf-8")).hexdigest()
     key = "CMSREDIRECT:{}:{}".format(hashed_path, site_id)
     return key
+
+
+def normalize_url(path):
+    if settings.APPEND_SLASH and not path.endswith("/"):
+        path = "%s/" % path
+    if not path.startswith("/"):
+        path = "/%s" % path
+    return path

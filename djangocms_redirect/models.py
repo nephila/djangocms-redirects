@@ -1,12 +1,13 @@
 from urllib.parse import unquote_plus
 
-from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.db import models
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
+
+from .utils import normalize_url
 
 RESPONSE_CODES = (
     ("301", _("301 - Permanent redirection")),
@@ -63,10 +64,7 @@ class Redirect(models.Model):
         ordering = ("old_path",)
 
     def clean(self):
-        if settings.APPEND_SLASH and not self.old_path.endswith("/"):
-            self.old_path = "%s/" % self.old_path
-        if not self.old_path.startswith("/"):
-            self.old_path = "/%s" % self.old_path
+        self.old_path = normalize_url(self.old_path)
         super().clean()
 
     def __str__(self):
