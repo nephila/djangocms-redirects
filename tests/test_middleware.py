@@ -342,67 +342,36 @@ class TestClean(BaseRedirectTest):
         {"en": {"title": "home page", "template": "page.html", "publish": True}},
     )
 
-    def test_clean_append_slash(self):
+    def _make_form(self, old_path):
         pages = self.get_pages()
+        return RedirectForm({
+            "site": self.site_1.pk,
+            "old_path": old_path,
+            "new_path": pages[0].get_absolute_url(),
+            "response_code": "301",
+        })
 
-        with override_settings(APPEND_SLASH=True):
-            redirect_form = RedirectForm({
-                "site": self.site_1.pk,
-                "old_path": "/foo",
-                "new_path": pages[0].get_absolute_url(),
-                "response_code": "301",
-            })
-            redirect = redirect_form.save()
-            self.assertEqual(redirect.old_path, '/foo/')
+    def _assert_clean(self, old_path, old_path_cleaned):
+        redirect_form = self._make_form(old_path)
+        redirect = redirect_form.save()
+        self.assertEqual(redirect.old_path, old_path_cleaned)
 
     def test_clean_keep_slash(self):
-        pages = self.get_pages()
-
-        redirect_form = RedirectForm({
-            "site": self.site_1.pk,
-            "old_path": "/foo/",
-            "new_path": pages[0].get_absolute_url(),
-            "response_code": "301",
-        })
-        redirect = redirect_form.save()
-        self.assertEqual(redirect.old_path, '/foo/')
-
-    def test_clean_no_append_slash(self):
-        pages = self.get_pages()
-
-        with override_settings(APPEND_SLASH=False):
-            redirect_form = RedirectForm({
-                "site": self.site_1.pk,
-                "old_path": "/foo",
-                "new_path": pages[0].get_absolute_url(),
-                "response_code": "301",
-            })
-            redirect = redirect_form.save()
-            self.assertEqual(redirect.old_path, '/foo')
+        self._assert_clean("/slash-bar/", "/slash-bar/")
 
     def test_clean_prepend_slash(self):
-        pages = self.get_pages()
-
-        redirect_form = RedirectForm({
-            "site": self.site_1.pk,
-            "old_path": "foo/",
-            "new_path": pages[0].get_absolute_url(),
-            "response_code": "301",
-        })
-        redirect = redirect_form.save()
-        self.assertEqual(redirect.old_path, '/foo/')
+        self._assert_clean("slash-test/", "/slash-test/")
 
     def test_clean_single_slash_root(self):
-        pages = self.get_pages()
+        self._assert_clean("/", "/")
 
-        redirect_form = RedirectForm({
-            "site": self.site_1.pk,
-            "old_path": "/",
-            "new_path": pages[0].get_absolute_url(),
-            "response_code": "301",
-        })
-        redirect = redirect_form.save()
-        self.assertEqual(redirect.old_path, '/')
+    def test_clean_append_slash(self):
+        with override_settings(APPEND_SLASH=True):
+            self._assert_clean("/slash-foo", "/slash-foo/")
+
+    def test_clean_no_append_slash(self):
+        with override_settings(APPEND_SLASH=False):
+            self._assert_clean("/slash-baz", "/slash-baz")
 
 class TestPartialMatch(BaseRedirectTest):
     _pages_data = (
