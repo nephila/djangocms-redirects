@@ -12,6 +12,17 @@ For each redirect you must provide:
 * **Redirect to**: The path to which the request will be redirected: you can type any URL or select an existing django CMS page.
 * **Response code**: You can select 3 types of status_code header: 301 (permanent redirect), 302 (temporary redirect) or 410 (permanent unavailable resource).
 
+Each **redirect from** URL must be unique and start with a slash. If you leave out the
+leading slash when creating a redirect, it is added automatically.
+
+If the user requests a page without a trailing slash and there is no redirect for that
+URL but there is one for the URL with a trailing slash, that redirect is used. For
+backwards-compatibility, this is also true when ``APPEND_SLASH=False``.
+
+If ``APPEND_SLASH=True`` (the default), a trailing slash is added automatically when
+creating a redirect. That way, there is only ever a single relevant redirect,
+whether there is a trailing slash or not.
+
 ****************
 Subpath matching
 ****************
