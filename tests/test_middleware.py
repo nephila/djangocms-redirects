@@ -4,9 +4,9 @@ from django.test.utils import override_settings
 from django.utils.encoding import force_text
 from django.utils.http import urlunquote_plus
 
+from djangocms_redirect.admin import RedirectForm
 from djangocms_redirect.middleware import RedirectMiddleware
 from djangocms_redirect.models import Redirect
-from djangocms_redirect.admin import RedirectForm
 
 from . import BaseRedirectTest
 
