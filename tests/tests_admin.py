@@ -1,4 +1,5 @@
 from unittest import skipIf
+
 from cms.forms.widgets import PageSmartLinkWidget
 from django.contrib import admin
 from django.urls import reverse
