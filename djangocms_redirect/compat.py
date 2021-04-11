@@ -1,5 +1,7 @@
 from distutils.version import LooseVersion
+
 import cms
+
 
 CMS_VERSION = cms.__version__
 
