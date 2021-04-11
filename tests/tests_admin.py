@@ -31,7 +31,7 @@ class AdminPageTest(BaseRedirectTest):
         activate("en")
 
     @skipIf(not CMS_LT_4, "Test relevant only for CMS>=4.0")
-    def test_get_form_widgets(self):
+    def test_get_form_widgets_djangocms_4_plus(self):
         """
         Admin form has proper widgets.
         """
@@ -43,6 +43,6 @@ class AdminPageTest(BaseRedirectTest):
         self.assertTrue(form.fields["new_path"].widget, PageSmartLinkWidget)
         self.assertEqual(form.fields["old_path"].widget.language, "it")
         self.assertEqual(form.fields["new_path"].widget.language, "it")
-        self.assertEqual(form.fields["old_path"].widget.ajax_url, reverse("admin:cms_page_get_published_pagelist"))
-        self.assertEqual(form.fields["new_path"].widget.ajax_url, reverse("admin:cms_page_get_published_pagelist"))
+        self.assertEqual(form.fields["old_path"].widget.ajax_url, reverse("admin:cms_page_get_list"))
+        self.assertEqual(form.fields["new_path"].widget.ajax_url, reverse("admin:cms_page_get_list"))
         activate("en")
